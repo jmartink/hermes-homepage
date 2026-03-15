@@ -7,175 +7,128 @@
   <title>Franc | Into Open Waters</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a0a;
-      --bg-soft: rgba(10, 10, 10, 0.82);
-      --green: #00ff41;
-      --amber: #ffb000;
-      --line: rgba(0, 255, 65, 0.18);
-      --glow: 0 0 8px rgba(0, 255, 65, 0.45), 0 0 18px rgba(0, 179, 60, 0.18);
-      --amber-glow: 0 0 10px rgba(255, 176, 0, 0.42);
-      --ascii-size: clamp(0.34rem, 1vw, 0.78rem);
+      --art: #7ab87e;
+      --art-kicker: #8eb98a;
+      --motto: #5a7a5e;
+      --footer: #3a5a3e;
+      --flash: rgba(255, 255, 255, 0.05);
+      --ascii-size: clamp(0.28rem, 0.95vw, 0.72rem);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      background: var(--bg);
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "JetBrains Mono", "Courier New", Courier, monospace;
-      background:
-        radial-gradient(circle at top, rgba(0, 255, 65, 0.06), transparent 40%),
-        radial-gradient(circle at bottom, rgba(255, 176, 0, 0.06), transparent 35%),
-        var(--bg);
-      color: var(--green);
-      text-shadow: var(--glow);
-      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--art);
     }
 
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    body::before {
-      background:
-        linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.03) 0,
-          rgba(255, 255, 255, 0.03) 1px,
-          transparent 1px,
-          transparent 3px
-        );
-      mix-blend-mode: screen;
-      opacity: 0.16;
-    }
-
-    body::after {
-      background:
-        radial-gradient(circle at center, transparent 54%, rgba(0, 0, 0, 0.54) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 58%);
-      transform: scale(1.04, 1.01);
-      opacity: 0.78;
-    }
-
-    canvas#matrix {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      opacity: 0.18;
-      pointer-events: none;
-    }
-
-    .screen {
-      position: relative;
-      z-index: 1;
+    .page {
       min-height: 100vh;
-      width: min(100%, 1040px);
-      margin: 0 auto;
-      padding: 2.5rem 1.25rem 2rem;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      padding: 2rem 1rem 1.25rem;
     }
 
-    .landing {
+    .hero {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.35rem;
-    }
-
-    .video-shell {
-      width: min(100%, 800px);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0, 30, 6, 0.24), rgba(0, 0, 0, 0.5));
-      box-shadow:
-        inset 0 0 20px rgba(0, 255, 65, 0.08),
-        0 0 32px rgba(0, 0, 0, 0.45);
-      overflow: hidden;
+      gap: 3rem;
+      flex: 1;
     }
 
     .media-video {
       display: block;
-      width: 100%;
-      max-width: 800px;
+      width: min(100%, 720px);
+      max-width: 720px;
+      height: auto;
       background: #000;
-      box-shadow: inset 0 0 18px rgba(0, 255, 65, 0.08);
     }
 
-    .terminal-frame {
-      position: relative;
-      width: min(100%, 980px);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(0, 30, 6, 0.36), rgba(0, 0, 0, 0.52));
-      box-shadow:
-        inset 0 0 20px rgba(0, 255, 65, 0.08),
-        0 0 32px rgba(0, 0, 0, 0.45);
-      padding: 1.25rem;
-      overflow: hidden;
+    .art-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0;
+      transform: translateY(1rem);
+      transition: opacity 2s ease, transform 2s ease;
     }
 
-    .terminal-frame::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(0, 255, 65, 0.03), transparent 18%, transparent 82%, rgba(255, 176, 0, 0.04));
-      pointer-events: none;
+    .art-block.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .ascii-wrap {
-      display: flex;
-      justify-content: center;
+      width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
-      padding-bottom: 0.25rem;
+      display: flex;
+      justify-content: center;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .ascii-wrap::-webkit-scrollbar {
+      display: none;
     }
 
     .ascii-art {
       margin: 0;
+      padding: 0;
       white-space: pre;
       line-height: 1.04;
       letter-spacing: 0.01em;
       font-size: var(--ascii-size);
-      color: var(--green);
-      text-shadow: 0 0 6px rgba(0, 255, 65, 0.55), 0 0 20px rgba(0, 255, 65, 0.14);
+      color: var(--art);
+      opacity: 0.85;
       min-width: fit-content;
-      transition: color 0.3s ease, text-shadow 0.3s ease;
+      transition: opacity 0.35s ease, color 0.35s ease;
     }
 
-    body.konami .ascii-art {
-      color: #9fffd1;
-      text-shadow: 0 0 8px rgba(159, 255, 209, 0.68), 0 0 22px rgba(84, 198, 255, 0.2);
+    .ascii-art:hover {
+      opacity: 1;
+    }
+
+    .motto-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      text-align: center;
     }
 
     .motto {
-      color: var(--amber);
-      text-shadow: var(--amber-glow);
+      color: var(--motto);
       font-style: italic;
-      font-size: clamp(0.95rem, 2vw, 1.15rem);
-      text-align: center;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
     }
 
     .typing-line {
-      min-height: 1.6rem;
-      color: var(--amber);
-      text-shadow: var(--amber-glow);
-      font-size: clamp(0.92rem, 2vw, 1.08rem);
-      text-align: center;
+      min-height: 1.3rem;
+      color: var(--motto);
+      font-style: italic;
+      font-size: 0.85rem;
+      line-height: 1.5;
     }
 
     .cursor {
@@ -186,133 +139,95 @@
     }
 
     @keyframes blink {
-      50% { opacity: 0; }
+      50% {
+        opacity: 0;
+      }
     }
 
     footer {
+      width: 100%;
+      margin-top: 4rem;
       text-align: center;
-      color: #d6ffd8;
-      font-size: 0.95rem;
-    }
-
-    footer a {
-      color: var(--amber);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-    }
-
-    footer a:hover,
-    footer a:focus-visible {
-      border-color: var(--amber);
-      outline: none;
+      color: var(--footer);
+      font-size: 0.7rem;
+      line-height: 1.4;
     }
 
     .flash {
       position: fixed;
       inset: 0;
-      background:
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.32), rgba(255, 176, 0, 0.12) 30%, transparent 72%);
+      background: var(--flash);
       opacity: 0;
       pointer-events: none;
-      z-index: 11;
     }
 
     .flash.active {
-      animation: flash 0.55s ease-out;
+      animation: flash 0.4s ease-out;
     }
 
     @keyframes flash {
-      0% { opacity: 0; }
-      18% { opacity: 1; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 0;
+      }
+      18% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
     }
 
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      8% { opacity: 0.97; }
-      13% { opacity: 1; }
-      21% { opacity: 0.985; }
-      34% { opacity: 0.96; }
-      55% { opacity: 1; }
-      89% { opacity: 0.98; }
+    body.konami .ascii-art {
+      color: var(--art-kicker);
+      opacity: 0.96;
     }
 
-    .flicker {
-      animation: flicker 4s linear infinite;
+    body.konami .motto,
+    body.konami .typing-line {
+      color: #6f8565;
     }
 
     @media (max-width: 720px) {
-      :root {
-        --ascii-size: clamp(0.22rem, 0.9vw, 0.5rem);
+      .page {
+        padding: 1.25rem 0.75rem 1rem;
       }
 
-      .screen {
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
+      .hero {
+        gap: 2.25rem;
       }
 
-      .terminal-frame {
-        padding: 0.85rem;
+      .media-video {
+        width: 100%;
+      }
+
+      .ascii-art {
+        margin: 0 auto;
       }
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix" aria-hidden="true"></canvas>
   <div class="flash" id="flash" aria-hidden="true"></div>
 
-  <main class="screen flicker">
-    <div class="landing">
-      <div class="video-shell">
-        <video class="media-video" autoplay muted playsinline preload="auto">
-          <source src="assets/franc_intro.mp4" type="video/mp4">
-        </video>
-      </div>
+  <main class="page">
+    <section class="hero">
+      <video class="media-video" autoplay muted playsinline preload="auto">
+        <source src="assets/franc_intro.mp4" type="video/mp4">
+      </video>
 
-      <div class="terminal-frame">
+      <section class="art-block" id="art-block" aria-label="Franc landing art">
         <div class="ascii-wrap">
-          <pre class="ascii-art" id="hero-art" aria-label="ASCII art of a galleon between pillars">
-          .                    .              .                         
-   .            .  *          .        .            *        .          
-      *    .         .    .        .         .          .               
- ║                          ___                              ║          
- ║                         /   \                             ║          
- ║                    .   / .   \   .                        ║          
- ║                  ____ / /|\ \ ____                        ║          
- ║                 /   // / | \ \\   \                       ║          
- ║                / / // /  |  \ \\ \ \                      ║          
- ║               / / //_.---.--._\\ \ \                      ║          
- ║              / / / _/    |    \_ \ \ \                    ║          
- ║             / / / /|     |     |\ \ \ \                   ║          
- ║            / /_/ / |     |     | \ \_\ \                  ║          
- ║          _/     /__|_____|_____|__\     \_                ║          
- ║         |  _____________________________  |               ║          
- ║         | |  [] [] [] F R A N C [] []  | |               ║           
- ║         | |___________________________| |                ║           
- ║          \___/                    \___/                   ║          
- ║     ~ ~   \_________________________/   ~ ~              ║           
- ║   ~   ~  ~  ~ ~ ~ ~  ~ ~  ~ ~ ~ ~  ~ ~  ~   ~          ║             
- ║ ~  ~  ~ ~ ~  ~ ~ ~  ~ ~ ~  ~ ~ ~ ~ ~  ~ ~ ~  ~         ║             
- ║   ~  ~  ~ ~ ~  ~  ~ ~  ~ ~ ~  ~  ~ ~ ~ ~  ~  ~         ║             
- ║  ~ ~  ~ ~ ~  ~ ~ ~  ~ ~ ~  ~ ~ ~ ~ ~  ~ ~ ~  ~         ║             
- ║ ~  ~  ~  ~  ~ ~  ~ ~  ~  ~ ~ ~  ~ ~  ~ ~  ~  ~ ~       ║             
- ╠═══════════════════════════════════════════════════════════╣          
- ║ ░░░░▒▒░░░░  ╔═══════════════════════╗  ░░░░▒▒░░░░       ║            
- ║ ░░░░▒▒░░░░  ║   .: A N N O :.      ║  ░░░░▒▒░░░░       ║             
- ║ ░░░░▒▒░░░░  ║      M D C X X       ║  ░░░░▒▒░░░░       ║             
- ║ ░░░░▒▒░░░░  ╚═══════════════════════╝  ░░░░▒▒░░░░       ║            
- ╚═════════════════════════════════════════════════════════════╝         
-          </pre>
+          <pre class="ascii-art" id="hero-art" aria-label="ASCII art of a galleon between pillars"></pre>
         </div>
-      </div>
 
-      <div class="motto" id="motto">Multi pertransibunt et augebitur scientia</div>
-      <div class="typing-line"><span id="typed-text"></span><span class="cursor">_</span></div>
+        <div class="motto-group">
+          <div class="motto" id="motto">Multi pertransibunt et augebitur scientia</div>
+          <div class="typing-line"><span id="typed-text"></span><span class="cursor">_</span></div>
+        </div>
+      </section>
+    </section>
 
-      <footer>
-        <p>Into open waters • Powered by <a href="https://github.com/NousResearch" target="_blank" rel="noreferrer">Nous Research</a></p>
-      </footer>
-    </div>
+    <footer>Into open waters</footer>
   </main>
 
   <script>
@@ -391,6 +306,7 @@
     const typedText = document.getElementById("typed-text");
     const motto = document.getElementById("motto");
     const flash = document.getElementById("flash");
+    const artBlock = document.getElementById("art-block");
     const charsetBase = "01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓ#$%&*+.";
     let matrixExtra = "";
     let audioContext;
@@ -548,49 +464,31 @@
       }
     });
 
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    let columns = [];
-    let fontSize = 18;
-
-    function resizeMatrix() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      fontSize = window.innerWidth < 720 ? 14 : 18;
-      const count = Math.ceil(window.innerWidth / fontSize);
-      columns = Array.from({ length: count }, () => Math.random() * window.innerHeight / fontSize);
+    function revealArt() {
+      artBlock.classList.add("visible");
     }
 
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(10, 10, 10, 0.09)";
-      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      ctx.font = fontSize + 'px "JetBrains Mono", monospace';
-
-      const chars = (charsetBase + matrixExtra).split("");
-      columns.forEach((y, index) => {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        const x = index * fontSize;
-        ctx.fillStyle = matrixExtra && Math.random() > 0.85 ? "rgba(255, 176, 0, 0.95)" : "rgba(0, 255, 65, 0.72)";
-        ctx.fillText(text, x, y * fontSize);
-        if (y * fontSize > window.innerHeight && Math.random() > 0.975) {
-          columns[index] = 0;
-        } else {
-          columns[index] = y + 1;
-        }
-      });
-      requestAnimationFrame(drawMatrix);
-    }
-
-    resizeMatrix();
-    drawMatrix();
     renderArt(startArt);
     typeText(initialTranslation, 32);
 
-    window.addEventListener("resize", resizeMatrix);
+    if ("IntersectionObserver" in window) {
+      const artObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            revealArt();
+            artObserver.disconnect();
+          }
+        });
+      }, {
+        threshold: 0.2
+      });
+
+      artObserver.observe(artBlock);
+    }
+
+    window.addEventListener("load", () => {
+      setTimeout(revealArt, 120);
+    }, { once: true });
   </script>
 </body>
 </html>
