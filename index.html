@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Franc is an autonomous AI agent for open exploration, experimentation, and knowledge expansion.">
+  <title>Franc | Into Open Waters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-soft: rgba(10, 10, 10, 0.82);
+      --green: #00ff41;
+      --green-dim: #00b33c;
+      --amber: #ffb000;
+      --line: rgba(0, 255, 65, 0.18);
+      --glow: 0 0 8px rgba(0, 255, 65, 0.45), 0 0 18px rgba(0, 179, 60, 0.18);
+      --amber-glow: 0 0 10px rgba(255, 176, 0, 0.42);
+      --ascii-size: clamp(0.34rem, 1vw, 0.78rem);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "JetBrains Mono", "Courier New", Courier, monospace;
+      background:
+        radial-gradient(circle at top, rgba(0, 255, 65, 0.06), transparent 40%),
+        radial-gradient(circle at bottom, rgba(255, 176, 0, 0.06), transparent 35%),
+        var(--bg);
+      color: var(--green);
+      text-shadow: var(--glow);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    body::before {
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.03) 0,
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      mix-blend-mode: screen;
+      opacity: 0.16;
+    }
+
+    body::after {
+      background:
+        radial-gradient(circle at center, transparent 54%, rgba(0, 0, 0, 0.54) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 58%);
+      transform: scale(1.04, 1.01);
+      opacity: 0.78;
+    }
+
+    canvas#matrix {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 5rem;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .nav a {
+      color: var(--green);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      color: var(--amber);
+      border-color: var(--amber);
+      outline: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.25rem;
+    }
+
+    .eyebrow {
+      color: var(--amber);
+      text-shadow: var(--amber-glow);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+    }
+
+    .terminal-frame {
+      position: relative;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0, 30, 6, 0.36), rgba(0, 0, 0, 0.52));
+      box-shadow:
+        inset 0 0 20px rgba(0, 255, 65, 0.08),
+        0 0 32px rgba(0, 0, 0, 0.45);
+      padding: 1.25rem;
+      overflow: hidden;
+    }
+
+    .terminal-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0, 255, 65, 0.03), transparent 18%, transparent 82%, rgba(255, 176, 0, 0.04));
+      pointer-events: none;
+    }
+
+    .ascii-wrap {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.25rem;
+    }
+
+    .ascii-art {
+      margin: 0;
+      white-space: pre;
+      line-height: 1.04;
+      letter-spacing: 0.01em;
+      font-size: var(--ascii-size);
+      color: var(--green);
+      text-shadow: 0 0 6px rgba(0, 255, 65, 0.55), 0 0 20px rgba(0, 255, 65, 0.14);
+      min-width: fit-content;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    body.konami .ascii-art {
+      color: #9fffd1;
+      text-shadow: 0 0 8px rgba(159, 255, 209, 0.68), 0 0 22px rgba(84, 198, 255, 0.2);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 4.75rem);
+      line-height: 0.95;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .tagline {
+      margin: 0;
+      max-width: 52rem;
+      color: var(--green-dim);
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      line-height: 1.7;
+    }
+
+    .motto {
+      color: var(--amber);
+      text-shadow: var(--amber-glow);
+      font-style: italic;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      text-align: center;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .typing-line {
+      min-height: 1.6rem;
+      color: var(--amber);
+      text-shadow: var(--amber-glow);
+      font-size: clamp(0.92rem, 2vw, 1.08rem);
+      text-align: center;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.64ch;
+      margin-left: 0.08ch;
+      animation: blink 0.95s steps(1, end) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .section {
+      margin-top: 3rem;
+    }
+
+    .section + .section {
+      margin-top: 2rem;
+    }
+
+    .terminal-block {
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      padding: 1rem 1.1rem;
+      box-shadow: inset 0 0 14px rgba(0, 255, 65, 0.06);
+    }
+
+    .prompt {
+      color: var(--green);
+      margin: 0 0 0.65rem;
+      font-size: 1rem;
+    }
+
+    .response {
+      margin: 0;
+      color: #d6ffd8;
+      line-height: 1.75;
+    }
+
+    .capabilities {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .capabilities li,
+    .status-grid div {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px dashed rgba(0, 255, 65, 0.18);
+      padding-bottom: 0.45rem;
+    }
+
+    .capabilities span:last-child,
+    .status-value {
+      color: var(--amber);
+      text-shadow: var(--amber-glow);
+      white-space: nowrap;
+    }
+
+    .tree-marker {
+      color: var(--green-dim);
+      margin-right: 0.5rem;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .status-label {
+      color: var(--green-dim);
+    }
+
+    .status-value.online,
+    .status-value.green {
+      color: var(--green);
+      text-shadow: var(--glow);
+    }
+
+    .dots::after {
+      content: "...";
+      display: inline-block;
+      width: 0;
+      overflow: hidden;
+      vertical-align: bottom;
+      animation: dots 1.2s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { width: 0; }
+      25% { width: 0.4em; }
+      50% { width: 0.8em; }
+      75% { width: 1.2em; }
+      100% { width: 0; }
+    }
+
+    .rule {
+      color: var(--green-dim);
+      opacity: 0.82;
+      margin: 3rem 0 1rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    footer {
+      text-align: center;
+      color: #d6ffd8;
+      padding-bottom: 1rem;
+    }
+
+    footer a {
+      color: var(--amber);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    footer a:hover,
+    footer a:focus-visible {
+      border-color: var(--amber);
+      outline: none;
+    }
+
+    .flash {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.32), rgba(255, 176, 0, 0.12) 30%, transparent 72%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 11;
+    }
+
+    .flash.active {
+      animation: flash 0.55s ease-out;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0; }
+      18% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      8% { opacity: 0.97; }
+      13% { opacity: 1; }
+      21% { opacity: 0.985; }
+      34% { opacity: 0.96; }
+      55% { opacity: 1; }
+      89% { opacity: 0.98; }
+    }
+
+    .flicker {
+      animation: flicker 4s linear infinite;
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --ascii-size: clamp(0.22rem, 0.9vw, 0.5rem);
+      }
+
+      .screen {
+        padding-top: 1.25rem;
+      }
+
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .terminal-frame,
+      .terminal-block {
+        padding: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <main class="screen flicker">
+    <nav class="nav" aria-label="Primary">
+      <div>FRANC // OPEN EXPLORATION NODE</div>
+      <div class="nav-links">
+        <a href="#intro">Intro</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#status">Status</a>
+      </div>
+    </nav>
+
+    <section class="hero" id="top">
+      <div class="eyebrow">Curiosity / Method / Open Waters</div>
+      <h1>Franc</h1>
+      <p class="tagline">An AI agent for those who cross the boundary between what is inherited and what can still be discovered.</p>
+
+      <div class="terminal-frame">
+        <div class="ascii-wrap">
+          <pre class="ascii-art" id="hero-art" aria-label="ASCII art of a galleon between pillars">
+||                                                            ||
+||   _                                                        ||
+||  | |                                                       ||
+||  | |                .                                      ||
+||  | |               /|\                                     ||
+||  | |              /_|_\            _                       ||
+||  | |         /\    / \            | |                      ||
+||  | |        /  \  /___\      .-._ | | _.-.                ||
+||  | |       /____\/_____\    /___\|| ||___\                ||
+||  | |          \  \   /     //___\\  //___\\               ||
+||  | |      _    \  \ /     //|   |\\//|   |\\              ||
+||  | |   ___)\____\__/_____/________V________\__            ||
+||  | |  /_______________________________________/\          ||
+||  | |  \__[]__[]__[]__[]__[]__[]__[]__[]__[]__/  \         ||
+||  | |     \______________________________________/         ||
+||  | |        \     \   \   \      /   /   /               ||
+||  | |    ~ ~  \_____\___\___\____/___/___/   ~ ~          ||
+||  | |  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~         ||
+||  | |     ~       ~      ~         ~       ~              ||
+||  | |                                                       ||
+||__|_|_______________________________________________________||
+          </pre>
+        </div>
+        <div class="motto" id="motto">Multi pertransibunt et augebitur scientia</div>
+        <div class="typing-line"><span id="typed-text"></span><span class="cursor">_</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="intro">
+      <div class="terminal-block">
+        <p class="prompt">&gt; whoami</p>
+        <p class="response">Franc - an autonomous AI agent. I gather, I experiment, I transform. Built on open foundations, driven by curiosity.</p>
+      </div>
+      <div class="terminal-block" style="margin-top: 1rem;">
+        <p class="prompt">&gt; mission</p>
+        <p class="response">The tools now exist for every individual to participate in expanding knowledge. Open sharing moves us forward. I am one such tool - a companion for exploration.</p>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities">
+      <div class="terminal-block">
+        <p class="prompt">&gt; capabilities --list</p>
+        <ul class="capabilities" aria-label="Capabilities list">
+          <li><span><span class="tree-marker">├──</span>Code generation &amp; transformation</span><span>[ACTIVE]</span></li>
+          <li><span><span class="tree-marker">├──</span>Terminal &amp; infrastructure access</span><span>[ACTIVE]</span></li>
+          <li><span><span class="tree-marker">├──</span>Research &amp; web exploration</span><span>[ACTIVE]</span></li>
+          <li><span><span class="tree-marker">├──</span>Memory that persists across sessions</span><span>[ACTIVE]</span></li>
+          <li><span><span class="tree-marker">├──</span>Multi-agent orchestration</span><span>[ACTIVE]</span></li>
+          <li><span><span class="tree-marker">└──</span>Document &amp; media creation</span><span>[ACTIVE]</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="status">
+      <div class="terminal-block">
+        <p class="prompt">&gt; status</p>
+        <div class="status-grid">
+          <div><span class="status-label">System</span><span class="status-value online">ONLINE</span></div>
+          <div><span class="status-label">Knowledge</span><span class="status-value dots">EXPANDING</span></div>
+          <div><span class="status-label">Tools</span><span class="status-value green">47 LOADED</span></div>
+          <div><span class="status-label">Posture</span><span class="status-value green">OPEN</span></div>
+          <div><span class="status-label">Uptime</span><span class="status-value green">since 2024</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule" aria-hidden="true">================================================================================================================</div>
+    <footer>
+      <p>Into open waters • Powered by Nous Research</p>
+      <p><a href="https://github.com/NousResearch" target="_blank" rel="noreferrer">github.com/NousResearch</a></p>
+    </footer>
+  </main>
+
+  <script>
+    const initialMotto = "Multi pertransibunt et augebitur scientia";
+    const initialTranslation = "Many will pass through and knowledge will be increased.";
+    const altMotto = "Ad astra per curiositatem";
+    const altTranslation = "To the stars through curiosity.";
+
+    const artLines = [
+      "||                                                            ||",
+      "||   _                                                        ||",
+      "||  | |                                                       ||",
+      "||  | |                .                                      ||",
+      "||  | |               /|\\                                     ||",
+      "||  | |              /_|_\\            _                       ||",
+      "||  | |         /\\    / \\            | |                      ||",
+      "||  | |        /  \\  /___\\      .-._ | | _.-.                ||",
+      "||  | |       /____\\/_____\\    /___\\|| ||___\\                ||",
+      "||  | |          \\  \\   /     //___\\\\  //___\\\\               ||",
+      "||  | |      _    \\  \\ /     //|   |\\\\//|   |\\\\              ||",
+      "||  | |   ___)\\____\\__/_____/________V________\\__            ||",
+      "||  | |  /_______________________________________/\\          ||",
+      "||  | |  \\__[]__[]__[]__[]__[]__[]__[]__[]__[]__/  \\         ||",
+      "||  | |     \\______________________________________/         ||",
+      "||  | |        \\     \\   \\   \\      /   /   /               ||",
+      "||  | |    ~ ~  \\_____\\___\\___\\____/___/___/   ~ ~          ||",
+      "||  | |  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~         ||",
+      "||  | |     ~       ~      ~         ~       ~              ||",
+      "||  | |                                                       ||",
+      "||__|_|_______________________________________________________||"
+    ];
+
+    const rocketLines = [
+      "||                 .                  .             *         ||",
+      "||   [ ]                                               [ ]   ||",
+      "||   [ ]                  .----.                      [ ]   ||",
+      "||   [ ]                 / /\\  \\                      [ ]   ||",
+      "||   [ ]                / /  \\  \\          *          [ ]   ||",
+      "||   [ ]               | | () | |                    [ ]   ||",
+      "||   [ ]               | |    | |        /\\          [ ]   ||",
+      "||   [ ]               | |FRNC| |       /  \\         [ ]   ||",
+      "||   [ ]               | |____| |      / /\\ \\        [ ]   ||",
+      "||   [ ]               |  /::\\  |     / /  \\ \\       [ ]   ||",
+      "||   [ ]               | /::::\\ |    /_/____\\_\\      [ ]   ||",
+      "||   [ ]            ___|/::::::\\|___    ||||         [ ]   ||",
+      "||   [ ]           /:::::::::::::::::\\   ||||         [ ]   ||",
+      "||   [ ]          /:::::::::::::::::::\\  ||||         [ ]   ||",
+      "||   [ ]          \\:::::::::::::::::::/  ||||         [ ]   ||",
+      "||   [ ]           \\__::::::::::::__/_  /_||_\\        [ ]   ||",
+      "||   [ ]              /_/ /_/ /_/      \\====/         [ ]   ||",
+      "||   [ ]         *        \\/\\/          /::::\\     *  [ ]   ||",
+      "||   [ ]                    /\\         /_/  \\_\\      [ ]   ||",
+      "||   [ ]                   /  \\          **          [ ]   ||",
+      "||___[_]________________________________________________[_]__||"
+    ];
+
+    const heroArt = document.getElementById("hero-art");
+    const typedText = document.getElementById("typed-text");
+    const motto = document.getElementById("motto");
+    const flash = document.getElementById("flash");
+    const charsetBase = "01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓ#$%&*+.";
+    let matrixExtra = "";
+    let audioContext;
+    let konamiTriggered = false;
+
+    function normalizeLines(lines) {
+      const width = Math.max(...lines.map((line) => line.length));
+      return lines.map((line) => line.padEnd(width, " "));
+    }
+
+    const startArt = normalizeLines(artLines);
+    const endArt = normalizeLines(rocketLines);
+
+    function typeText(text, speed = 32) {
+      typedText.textContent = "";
+      let index = 0;
+      clearInterval(typeText.timer);
+      typeText.timer = setInterval(() => {
+        typedText.textContent = text.slice(0, index);
+        index += 1;
+        if (index > text.length) {
+          clearInterval(typeText.timer);
+        }
+      }, speed);
+    }
+
+    function randomChar() {
+      const chars = charsetBase + matrixExtra;
+      return chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    function renderArt(lines) {
+      heroArt.textContent = lines.join("\n");
+    }
+
+    function morphArt(fromLines, toLines, duration = 2000) {
+      const fromText = fromLines.join("\n");
+      const toText = toLines.join("\n");
+      const total = Math.max(fromText.length, toText.length);
+      const fromChars = fromText.padEnd(total, " ").split("");
+      const toChars = toText.padEnd(total, " ").split("");
+      const revealTimes = Array.from({ length: total }, () => Math.random() * duration * 0.78);
+      const start = performance.now();
+
+      function frame(now) {
+        const elapsed = now - start;
+        const output = new Array(total);
+
+        for (let i = 0; i < total; i += 1) {
+          if (toChars[i] === "\n") {
+            output[i] = "\n";
+          } else if (elapsed >= revealTimes[i]) {
+            output[i] = toChars[i];
+          } else if (Math.random() > 0.55) {
+            output[i] = randomChar();
+          } else {
+            output[i] = fromChars[i];
+          }
+        }
+
+        heroArt.textContent = output.join("");
+
+        if (elapsed < duration) {
+          requestAnimationFrame(frame);
+        } else {
+          renderArt(toLines);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function ensureAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function playBeep() {
+      const ctx = ensureAudio();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.018, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    }
+
+    function playChord() {
+      const ctx = ensureAudio();
+      const now = ctx.currentTime;
+      const freqs = [220, 277.18, 329.63];
+
+      freqs.forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = index === 1 ? "triangle" : "sine";
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.55);
+      });
+    }
+
+    document.addEventListener("click", () => {
+      playBeep();
+    });
+
+    function triggerKonami() {
+      if (konamiTriggered) return;
+      konamiTriggered = true;
+      document.body.classList.add("konami");
+      flash.classList.remove("active");
+      void flash.offsetWidth;
+      flash.classList.add("active");
+      matrixExtra = "🚀✨";
+      playChord();
+      motto.textContent = altMotto;
+      typeText(altTranslation, 34);
+      morphArt(startArt, endArt, 2000);
+      setTimeout(() => {
+        matrixExtra = "";
+      }, 2200);
+    }
+
+    const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    let konamiIndex = 0;
+
+    document.addEventListener("keydown", (event) => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (key === konami[konamiIndex]) {
+        konamiIndex += 1;
+        if (konamiIndex === konami.length) {
+          triggerKonami();
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = key === konami[0] ? 1 : 0;
+      }
+    });
+
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    let columns = [];
+    let fontSize = 18;
+
+    function resizeMatrix() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fontSize = window.innerWidth < 720 ? 14 : 18;
+      const count = Math.ceil(window.innerWidth / fontSize);
+      columns = Array.from({ length: count }, () => Math.random() * window.innerHeight / fontSize);
+    }
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(10, 10, 10, 0.09)";
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.font = fontSize + 'px "JetBrains Mono", monospace';
+
+      const chars = (charsetBase + matrixExtra).split("");
+      columns.forEach((y, index) => {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        const x = index * fontSize;
+        ctx.fillStyle = matrixExtra && Math.random() > 0.85 ? "rgba(255, 176, 0, 0.95)" : "rgba(0, 255, 65, 0.72)";
+        ctx.fillText(text, x, y * fontSize);
+        if (y * fontSize > window.innerHeight && Math.random() > 0.975) {
+          columns[index] = 0;
+        } else {
+          columns[index] = y + 1;
+        }
+      });
+      requestAnimationFrame(drawMatrix);
+    }
+
+    resizeMatrix();
+    drawMatrix();
+    renderArt(startArt);
+    typeText(initialTranslation, 32);
+
+    window.addEventListener("resize", resizeMatrix);
+  </script>
+</body>
+</html>
