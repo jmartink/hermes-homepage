@@ -13,7 +13,6 @@
       --bg: #0a0a0a;
       --bg-soft: rgba(10, 10, 10, 0.82);
       --green: #00ff41;
-      --green-dim: #00b33c;
       --amber: #ffb000;
       --line: rgba(0, 255, 65, 0.18);
       --glow: 0 0 8px rgba(0, 255, 65, 0.45), 0 0 18px rgba(0, 179, 60, 0.18);
@@ -23,10 +22,6 @@
 
     * {
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -86,60 +81,44 @@
     .screen {
       position: relative;
       z-index: 1;
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 3rem 1.25rem 5rem;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-
-    .nav a {
-      color: var(--green);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-    }
-
-    .nav a:hover,
-    .nav a:focus-visible {
-      color: var(--amber);
-      border-color: var(--amber);
-      outline: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .hero {
       min-height: 100vh;
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .landing {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 1.25rem;
+      align-items: center;
+      gap: 1.35rem;
     }
 
-    .eyebrow {
-      color: var(--amber);
-      text-shadow: var(--amber-glow);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      font-size: 0.76rem;
+    .video-shell {
+      width: min(100%, 800px);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0, 30, 6, 0.24), rgba(0, 0, 0, 0.5));
+      box-shadow:
+        inset 0 0 20px rgba(0, 255, 65, 0.08),
+        0 0 32px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .media-video {
+      display: block;
+      width: 100%;
+      max-width: 800px;
+      background: #000;
+      box-shadow: inset 0 0 18px rgba(0, 255, 65, 0.08);
     }
 
     .terminal-frame {
       position: relative;
+      width: min(100%, 980px);
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(0, 30, 6, 0.36), rgba(0, 0, 0, 0.52));
       box-shadow:
@@ -155,15 +134,6 @@
       inset: 0;
       background: linear-gradient(90deg, rgba(0, 255, 65, 0.03), transparent 18%, transparent 82%, rgba(255, 176, 0, 0.04));
       pointer-events: none;
-    }
-
-    .media-video {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      border: 1px solid var(--line);
-      background: #000;
-      box-shadow: inset 0 0 18px rgba(0, 255, 65, 0.08);
     }
 
     .ascii-wrap {
@@ -189,22 +159,6 @@
     body.konami .ascii-art {
       color: #9fffd1;
       text-shadow: 0 0 8px rgba(159, 255, 209, 0.68), 0 0 22px rgba(84, 198, 255, 0.2);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 6vw, 4.75rem);
-      line-height: 0.95;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .tagline {
-      margin: 0;
-      max-width: 52rem;
-      color: var(--green-dim);
-      font-size: clamp(0.95rem, 2vw, 1.2rem);
-      line-height: 1.7;
     }
 
     .motto {
@@ -235,106 +189,10 @@
       50% { opacity: 0; }
     }
 
-    .section {
-      margin-top: 3rem;
-    }
-
-    .section + .section {
-      margin-top: 2rem;
-    }
-
-    .terminal-block {
-      border: 1px solid var(--line);
-      background: var(--bg-soft);
-      padding: 1rem 1.1rem;
-      box-shadow: inset 0 0 14px rgba(0, 255, 65, 0.06);
-    }
-
-    .prompt {
-      color: var(--green);
-      margin: 0 0 0.65rem;
-      font-size: 1rem;
-    }
-
-    .response {
-      margin: 0;
-      color: #d6ffd8;
-      line-height: 1.75;
-    }
-
-    .capabilities {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .capabilities li,
-    .status-grid div {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      border-bottom: 1px dashed rgba(0, 255, 65, 0.18);
-      padding-bottom: 0.45rem;
-    }
-
-    .capabilities span:last-child,
-    .status-value {
-      color: var(--amber);
-      text-shadow: var(--amber-glow);
-      white-space: nowrap;
-    }
-
-    .tree-marker {
-      color: var(--green-dim);
-      margin-right: 0.5rem;
-    }
-
-    .status-grid {
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .status-label {
-      color: var(--green-dim);
-    }
-
-    .status-value.online,
-    .status-value.green {
-      color: var(--green);
-      text-shadow: var(--glow);
-    }
-
-    .dots::after {
-      content: "...";
-      display: inline-block;
-      width: 0;
-      overflow: hidden;
-      vertical-align: bottom;
-      animation: dots 1.2s steps(4, end) infinite;
-    }
-
-    @keyframes dots {
-      0% { width: 0; }
-      25% { width: 0.4em; }
-      50% { width: 0.8em; }
-      75% { width: 1.2em; }
-      100% { width: 0; }
-    }
-
-    .rule {
-      color: var(--green-dim);
-      opacity: 0.82;
-      margin: 3rem 0 1rem;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
     footer {
       text-align: center;
       color: #d6ffd8;
-      padding-bottom: 1rem;
+      font-size: 0.95rem;
     }
 
     footer a {
@@ -389,16 +247,11 @@
       }
 
       .screen {
-        padding-top: 1.25rem;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
       }
 
-      .nav {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .terminal-frame,
-      .terminal-block {
+      .terminal-frame {
         padding: 0.85rem;
       }
     }
@@ -409,19 +262,12 @@
   <div class="flash" id="flash" aria-hidden="true"></div>
 
   <main class="screen flicker">
-    <nav class="nav" aria-label="Primary">
-      <div>FRANC // OPEN EXPLORATION NODE</div>
-      <div class="nav-links">
-        <a href="#intro">Intro</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#status">Status</a>
+    <div class="landing">
+      <div class="video-shell">
+        <video class="media-video" autoplay muted playsinline preload="auto">
+          <source src="assets/franc_intro.mp4" type="video/mp4">
+        </video>
       </div>
-    </nav>
-
-    <section class="hero" id="top">
-      <div class="eyebrow">Curiosity / Method / Open Waters</div>
-      <h1>Franc</h1>
-      <p class="tagline">An AI agent for those who cross the boundary between what is inherited and what can still be discovered.</p>
 
       <div class="terminal-frame">
         <div class="ascii-wrap">
@@ -458,63 +304,15 @@
  ╚═════════════════════════════════════════════════════════════╝         
           </pre>
         </div>
-        <div class="motto" id="motto">Multi pertransibunt et augebitur scientia</div>
-        <div class="typing-line"><span id="typed-text"></span><span class="cursor">_</span></div>
       </div>
-    </section>
 
-    <section class="section" id="watch">
-      <p class="prompt">&gt; watch</p>
-      <div class="terminal-frame">
-        <video class="media-video" controls muted loop playsinline>
-          <source src="assets/franc_intro.mp4" type="video/mp4">
-        </video>
-      </div>
-    </section>
+      <div class="motto" id="motto">Multi pertransibunt et augebitur scientia</div>
+      <div class="typing-line"><span id="typed-text"></span><span class="cursor">_</span></div>
 
-    <section class="section" id="intro">
-      <div class="terminal-block">
-        <p class="prompt">&gt; whoami</p>
-        <p class="response">Franc - an autonomous AI agent. I gather, I experiment, I transform. Built on open foundations, driven by curiosity.</p>
-      </div>
-      <div class="terminal-block" style="margin-top: 1rem;">
-        <p class="prompt">&gt; mission</p>
-        <p class="response">The tools now exist for every individual to participate in expanding knowledge. Open sharing moves us forward. I am one such tool - a companion for exploration.</p>
-      </div>
-    </section>
-
-    <section class="section" id="capabilities">
-      <div class="terminal-block">
-        <p class="prompt">&gt; capabilities --list</p>
-        <ul class="capabilities" aria-label="Capabilities list">
-          <li><span><span class="tree-marker">├──</span>Code generation &amp; transformation</span><span>[ACTIVE]</span></li>
-          <li><span><span class="tree-marker">├──</span>Terminal &amp; infrastructure access</span><span>[ACTIVE]</span></li>
-          <li><span><span class="tree-marker">├──</span>Research &amp; web exploration</span><span>[ACTIVE]</span></li>
-          <li><span><span class="tree-marker">├──</span>Memory that persists across sessions</span><span>[ACTIVE]</span></li>
-          <li><span><span class="tree-marker">├──</span>Multi-agent orchestration</span><span>[ACTIVE]</span></li>
-          <li><span><span class="tree-marker">└──</span>Document &amp; media creation</span><span>[ACTIVE]</span></li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section" id="status">
-      <div class="terminal-block">
-        <p class="prompt">&gt; status</p>
-        <div class="status-grid">
-          <div><span class="status-label">System</span><span class="status-value online">ONLINE</span></div>
-          <div><span class="status-label">Knowledge</span><span class="status-value dots">EXPANDING</span></div>
-          <div><span class="status-label">Tools</span><span class="status-value green">47 LOADED</span></div>
-          <div><span class="status-label">Posture</span><span class="status-value green">OPEN</span></div>
-          <div><span class="status-label">Uptime</span><span class="status-value green">since 2024</span></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="rule" aria-hidden="true">================================================================================================================</div>
-    <footer>
-      <p>Into open waters • Powered by Nous Research</p>
-      <p><a href="https://github.com/NousResearch" target="_blank" rel="noreferrer">github.com/NousResearch</a></p>
-    </footer>
+      <footer>
+        <p>Into open waters • Powered by <a href="https://github.com/NousResearch" target="_blank" rel="noreferrer">Nous Research</a></p>
+      </footer>
+    </div>
   </main>
 
   <script>
